@@ -15,11 +15,7 @@ class FriendlyChatApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'FriendlyChat',
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('FriendlyChat'),
-        ),
-      ),
+      home: ChatScreen(),
     );
   }
 }
@@ -34,12 +30,41 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final _textController = TextEditingController();
 
+  void _handleSubmitted(String text) {
+    _textController.clear();
+  }
+
+  Widget _buildTextComposer() {
+    return Container(
+      //EdgeInsets.symmetric, bir cihazın piksel oranına bağlı olarak belirli sayıda fiziksel piksele dönüştürülen mantıksal piksellerdir.
+      margin: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: Row(
+        children: [
+          Flexible(
+            child: TextField(
+              controller: _textController,
+              onSubmitted: _handleSubmitted,
+              decoration:
+                  const InputDecoration.collapsed(hintText: 'Send a message'),
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 4.0),
+            child: IconButton(
+              icon: const Icon(Icons.send),
+              onPressed: ()=>_handleSubmitted(_textController.text),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("FriendlyChat"),
-      ),
+      appBar: AppBar(title: Text('FriendlyChat')),
+      body: _buildTextComposer(), // NEW
     );
   }
 }
