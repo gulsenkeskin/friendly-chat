@@ -48,11 +48,16 @@ class _ChatScreenState extends State<ChatScreen> {
                   const InputDecoration.collapsed(hintText: 'Send a message'),
             ),
           ),
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 4.0),
-            child: IconButton(
-              icon: const Icon(Icons.send),
-              onPressed: ()=>_handleSubmitted(_textController.text),
+          IconTheme(
+            //butonun rengini değiştirmek
+            data: IconThemeData(color: Theme.of(context).colorScheme.secondary),
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 4.0),
+              child: IconButton(
+                icon: const Icon(Icons.send),
+                // Dart'ta ok sözdizimi ( => expression) bazen işlevleri bildirirken kullanılır. Bu kısaltmadır { return expression; }ve yalnızca tek satırlık işlevler için kullanılır
+                onPressed: () => _handleSubmitted(_textController.text),
+              ),
             ),
           )
         ],
