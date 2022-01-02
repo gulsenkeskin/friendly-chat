@@ -6,7 +6,7 @@ void main() {
   );
 }
 
-String _name = 'Your Name';
+String _name = 'Gülsen';
 
 class FriendlyChatApp extends StatelessWidget {
   const FriendlyChatApp({
@@ -23,37 +23,46 @@ class FriendlyChatApp extends StatelessWidget {
 }
 
 class ChatMessage extends StatelessWidget {
-  const ChatMessage({required this.text, Key? key}) : super(key: key);
+  const ChatMessage(
+      {required this.text, required this.animationController, Key? key})
+      : super(key: key);
   final String text;
+  final AnimationController animationController;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 10.0),
-      child: Row(
-        //CrossAxisAlignment.startmetni yatay eksen boyunca en soldaki konumda hizalar.
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            margin: const EdgeInsets.only(right: 16.0),
-            child: CircleAvatar(
-              child: Text(_name[0]),
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                _name,
-                style: Theme.of(context).textTheme.headline4,
+    //Animasyona bir SizeTransition widget'ı eklemek, metni içeri doğru kayarken giderek daha fazla ortaya çıkaran bir cliprect'i canlandırma etkisine sahiptir.
+    return SizeTransition(
+      sizeFactor:
+          CurvedAnimation(parent: animationController, curve: Curves.easeOut),
+      axisAlignment: 0.0,
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 10.0),
+        child: Row(
+          //CrossAxisAlignment.startmetni yatay eksen boyunca en soldaki konumda hizalar.
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              margin: const EdgeInsets.only(right: 16.0),
+              child: CircleAvatar(
+                child: Text(_name[0]),
               ),
-              Container(
-                margin: const EdgeInsets.only(top: 5.0),
-                child: Text(text),
-              )
-            ],
-          )
-        ],
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _name,
+                  style: Theme.of(context).textTheme.headline6,
+                ),
+                Container(
+                  margin: const EdgeInsets.only(top: 5.0),
+                  child: Text(text),
+                )
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
@@ -66,7 +75,7 @@ class ChatScreen extends StatefulWidget {
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   final List<ChatMessage> _messages = [];
   final _textController = TextEditingController();
   //içerik gönderildikten sonra odağı tekrar metin alanına getirmek için
@@ -74,11 +83,21 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _handleSubmitted(String text) {
     _textController.clear();
-    var message = ChatMessage(text: text);
+
+    var message = ChatMessage(
+      text: text,
+      animationController: AnimationController(
+          duration:
+              const Duration(milliseconds: 700), //animasyonun çalışma zamanı
+          vsync:
+              this //Bir Animasyon Denetleyicisi oluştururken, bunu bir vsync bağımsız değişkeni iletmeniz gerekir. Vsync, animasyonu ileriye doğru yönlendiren kalp atışlarının kaynağıdır (Senedi). Bu örnek, vsync olarak _Chat Ekran Durumunu kullanır, bu nedenle _Chat Ekran Durumu sınıf tanımına bir Ticker Sağlayıcı Durumu Mixin mixin ekler.
+          ),
+    );
     setState(() {
       _messages.insert(0, message);
     });
     _focusNode.requestFocus();
+    message.animationController.forward();
   }
 
   Widget _buildTextComposer() {
@@ -112,6 +131,14 @@ class _ChatScreenState extends State<ChatScreen> {
         ],
       ),
     );
+  }
+
+  //Artık ihtiyaç duyulmadığında kaynaklarınızı boşaltmak için animasyon denetleyicilerinizi elden çıkarmak için
+  void dispose() {
+    for (var message in _messages) {
+      message.animationController.dispose();
+    }
+    super.dispose();
   }
 
   @override
