@@ -118,7 +118,27 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('FriendlyChat')),
-      body: _buildTextComposer(), // NEW
+      body: Column(
+        children: [
+          Flexible(
+            child: ListView.builder(
+              //_ çizgi ile ilk argümanı kullanmayacağımı belirttim
+              itemBuilder: (_, index) => _messages[index],
+              padding: const EdgeInsets.all(8.0),
+              reverse: true,
+              itemCount: _messages.length,
+            ),
+          ),
+          const Divider(
+            height: 1.0,
+          ),
+          Container(
+            //BoxDecorationArka plan rengini tanımlayan yeni bir nesne oluşturur .
+            decoration: BoxDecoration(color: Theme.of(context).cardColor),
+            child: _buildTextComposer(),
+          )
+        ],
+      ), // NEW
     );
   }
 }
